@@ -9,10 +9,6 @@ library(dplyr)
 
 df <- read_excel("Data/Online Retail.xlsx") %>% select(InvoiceNo, Description)
 
-create_transactions <- function(df, id, item){
-  split.data.frame(df,id) %>%
-    lapply("[[",item)
-}
 
 trans <- create_transactions(df, df$InvoiceNo, "Description")
 
