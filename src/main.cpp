@@ -10,40 +10,42 @@ using namespace Rcpp;
 
 
 // [[Rcpp::export]]
-RcppExport SEXP test(List l)
+RcppExport SEXP FPGrowth(List l, double minimum_support)
 {
   std::vector<Transaction> transactions;
-  StringVector v;
-  std::vector<std::string> v_;
+  std::vector<std::string> v;
 
-  const auto minimum_support_threshold = 2;
-
+  // fill in transactions
   for ( int x = 0; x < l.size(); x++ ) {
-    v = l[x];
-    v_ = as<std::vector<std::string> >(v);
-    Rcout <<  "Iter  = " << v.size() << std::endl;
-    transactions.push_back(v_);
+    v = as<std::vector<std::string> >(l[x]);
+    transactions.push_back(v);
     }
 
+  const auto minimum_support_threshold = minimum_support;
   const FPTree fptree{ transactions, minimum_support_threshold };
   const std::set<Pattern> patterns = fptree_growth( fptree );
 
-  Rcout <<  "Patern Size  = " << patterns.size() << std::endl;
+  std::vector<std::string> sets;
+  std::string s = "{";
+  std::vector<double> values;
 
-
-  // Iterate over all elements of set
-  // using range based for loop
   for (auto elem : patterns)
   {
-    for (auto el : elem.first){
-      Rcout << el << " , ";
+    for (std::set<std::string>::iterator it=elem.first.begin(); it!=elem.first.end(); ++it){
+      if (std::next(it) == elem.first.end()){
+        s += *it;
+      } else {
+        s += *it + " -> ";
+      }
     }
-    Rcout << elem.second << " , ";
+    s += "}";
+
+    sets.push_back(s);
+    values.push_back(elem.second);
+
+    s = "{";
   }
-
-
-
-  return l;
-
+  return List::create(Named("Sets") = sets,
+                      Named("Support") = values);
 };
 
