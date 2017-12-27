@@ -5,15 +5,15 @@
 
 using namespace Rcpp;
 
-// FPGrowth
-RcppExport SEXP FPGrowth(List l, double minimum_support);
-RcppExport SEXP _FPGrowth_FPGrowth(SEXP lSEXP, SEXP minimum_supportSEXP) {
+// FPGrowth_
+RcppExport SEXP FPGrowth_(List l, double minimum_support);
+RcppExport SEXP _FPGrowth_FPGrowth_(SEXP lSEXP, SEXP minimum_supportSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< List >::type l(lSEXP);
     Rcpp::traits::input_parameter< double >::type minimum_support(minimum_supportSEXP);
-    rcpp_result_gen = Rcpp::wrap(FPGrowth(l, minimum_support));
+    rcpp_result_gen = Rcpp::wrap(FPGrowth_(l, minimum_support));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -29,7 +29,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_FPGrowth_FPGrowth", (DL_FUNC) &_FPGrowth_FPGrowth, 2},
+    {"_FPGrowth_FPGrowth_", (DL_FUNC) &_FPGrowth_FPGrowth_, 2},
     {"_FPGrowth_rcpp_hello", (DL_FUNC) &_FPGrowth_rcpp_hello, 0},
     {NULL, NULL, 0}
 };

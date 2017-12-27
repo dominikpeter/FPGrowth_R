@@ -7,22 +7,25 @@
 #include <Rcpp.h>
 
 using namespace Rcpp;
+// [[Rcpp::plugins(cpp11)]]
+
 
 
 // [[Rcpp::export]]
-RcppExport SEXP FPGrowth(List l, double minimum_support)
+RcppExport SEXP FPGrowth_(List l, double minimum_support)
 {
   std::vector<Transaction> transactions;
   std::vector<std::string> v;
 
   // fill in transactions
+
   for ( int x = 0; x < l.size(); x++ ) {
     v = as<std::vector<std::string> >(l[x]);
     transactions.push_back(v);
     }
 
-  const auto minimum_support_threshold = minimum_support;
-  const FPTree fptree{ transactions, minimum_support_threshold };
+  const double minimum_support_threshold = minimum_support;
+  const FPTree fptree{ transactions, minimum_support_threshold};
   const std::set<Pattern> patterns = fptree_growth( fptree );
 
   std::vector<std::string> sets;
@@ -45,7 +48,9 @@ RcppExport SEXP FPGrowth(List l, double minimum_support)
 
     s = "{";
   }
-  return List::create(Named("Sets") = sets,
-                      Named("Support") = values);
+
+  List L = List::create(Named("Sets") = sets,
+                        Named("Support") = values);
+  return L;
 };
 

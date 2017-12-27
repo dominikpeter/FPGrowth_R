@@ -5,13 +5,15 @@
 
 #include "fptree.hpp"
 
+#include <Rcpp.h>
+
 
 FPNode::FPNode(const Item& item, const std::shared_ptr<FPNode>& parent) :
     item( item ), frequency( 1 ), node_link( nullptr ), parent( parent ), children()
 {
 }
 
-FPTree::FPTree(const std::vector<Transaction>& transactions, uint64_t minimum_support_threshold) :
+FPTree::FPTree(const std::vector<Transaction>& transactions, double minimum_support_threshold) :
     root( std::make_shared<FPNode>( Item{}, nullptr ) ), header_table(),
     minimum_support_threshold( minimum_support_threshold )
 {
@@ -23,10 +25,27 @@ FPTree::FPTree(const std::vector<Transaction>& transactions, uint64_t minimum_su
         }
     }
 
+    // std::vector<Item> flatv;
+    // for (int x = 0; x < transactions.size(); x++){
+    //   for (int y = 0; y < transactions[x].size(); y++){
+    //     flatv.push_back(transactions[x][y]);
+    //   }
+    // }
+
+    std::vector<Item> flatv;
+    for(const auto &v: transactions)
+      flatv.insert(flatv.end(), v.begin(), v.end());
+
+    std::sort(flatv.begin(), flatv.end());
+    static const float uniqueCount = std::unique(flatv.begin(), flatv.end()) - flatv.begin();
+
     // keep only items which have a frequency greater or equal than the minimum support threshold
     for ( auto it = frequency_by_item.cbegin(); it != frequency_by_item.cend(); ) {
         const uint64_t item_frequency = (*it).second;
-        if ( item_frequency < minimum_support_threshold ) { frequency_by_item.erase( it++ ); }
+
+        double relativ_frequency = item_frequency/uniqueCount;
+
+        if ( relativ_frequency < minimum_support_threshold) { frequency_by_item.erase( it++ ); }
         else { ++it; }
     }
 
@@ -211,7 +230,7 @@ std::set<Pattern> fptree_growth(const FPTree& fptree)
             }
 
             // build the conditional fptree relative to the current item with the transactions just generated
-            const FPTree conditional_fptree( conditional_fptree_transactions, fptree.minimum_support_threshold );
+            const FPTree conditional_fptree( conditional_fptree_transactions, fptree.minimum_support_threshold);
             // call recursively fptree_growth on the conditional fptree (empty fptree: no patterns)
             std::set<Pattern> conditional_patterns = fptree_growth( conditional_fptree );
 

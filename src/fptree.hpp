@@ -30,9 +30,10 @@ struct FPNode {
 struct FPTree {
     std::shared_ptr<FPNode> root;
     std::map<Item, std::shared_ptr<FPNode>> header_table;
-    uint64_t minimum_support_threshold;
+    double minimum_support_threshold;
+    // uint64_t total_item_frequency;
 
-    FPTree(const std::vector<Transaction>&, uint64_t);
+    FPTree(const std::vector<Transaction>&, double);
 
     bool empty() const;
 };
